@@ -1,7 +1,6 @@
 // 7th
 
-package com.aneek.book.controllers;
-
+package com.aneek.book.controllers;   
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,15 +22,16 @@ import com.aneek.book.services.UserService;
 
 import jakarta.validation.Valid;
 
-@RestController
-@RequestMapping("/api/users")
+@RestController // @Controller(makes web controller) + @ResponseBody(return method object in json)
+@RequestMapping("/api/users")// used to http map web resquest
 public class UserController {
 
 @Autowired
 private UserService userService;
 
 //POST - create user
-@PostMapping("/")
+@PostMapping("/")  // Response entity used to represent HTTP response
+
 public ResponseEntity<UserDto>  createUser(@Valid @RequestBody UserDto userDto){
 
 UserDto createUserDto = this.userService.createUser(userDto);
@@ -42,10 +42,13 @@ return new ResponseEntity<>(createUserDto, HttpStatus.CREATED);
 //PUT - update user
 
 @PutMapping("/{userId}") // is called path URI variable  
-public ResponseEntity<UserDto> updateUser(@Valid @RequestBody  UserDto userDto, @PathVariable Integer userId) // user details will received with the help of @Requestbody
+public ResponseEntity<UserDto> updateUser(@Valid @RequestBody  UserDto userDto, @PathVariable Integer userId) 
+// @Valid used to validate method parameter
+// user details will received with the help of @Requestbody
+//@RequestBody indicates the parameter should be bound to the body of the web request
 {                                                                                                                                                                                                             // and stored in userDto.    
          
-                    // @PathVariable will help the fetch the data send by URI variable
+                    // @PathVariable denotes that the userId is to be taken from the URL path.
 
    UserDto updatedUser = this.userService.updateUser(userDto, userId);
    

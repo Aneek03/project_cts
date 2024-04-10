@@ -1,4 +1,4 @@
-// 8th
+// 9th
 
 package com.aneek.book.exceptions;
 
@@ -34,6 +34,8 @@ public class GlobalExceptionHandler {
 		Map<String, String> resp = new HashMap<>(); // to store all the exceptions to put data in key value pairs
 		
 		ex.getBindingResult().getAllErrors().forEach((error)->{ // Storing all the errors on map using foreach lamda expression
+//getBindingResult().getAllErrors() in Spring Boot retrieves all validation errors
+//associated with the object that was submitted to the server.
 			
 			//type casting object errors to field errors to get the getField method
 			String fieldName = ((FieldError)error).getField();

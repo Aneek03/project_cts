@@ -19,10 +19,10 @@ import com.aneek.book.services.FileService;
 @Service
 public class FileServiceImpl implements FileService {
 
-	@Override
+	@Override							// use to represent a file uploaded via web
 	public String uploadImage(String path, MultipartFile file) throws IOException {
-		
-		// File name
+		//file->path
+		// File namew
 				String name = file.getOriginalFilename();
 				// abc.png
 
@@ -32,6 +32,7 @@ public class FileServiceImpl implements FileService {
 
 				// Full path
 				String filePath = path + File.separator + fileName1;
+										// add slash("/")
 
 				// create folder if not created
 				File f = new File(path);

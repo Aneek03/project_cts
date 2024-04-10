@@ -121,6 +121,8 @@ public class PostController {
 	// search
 		@GetMapping("/posts/search/{keywords}")
 		public ResponseEntity<List<PostDto>> searchPostByTitle(@PathVariable("keywords") String keywords) {
+			
+			
 			List<PostDto> result = this.postService.searchPosts(keywords);
 			return new ResponseEntity<List<PostDto>>(result, HttpStatus.OK);
 		}
@@ -145,12 +147,19 @@ public class PostController {
 	    @GetMapping(value = "/post/image/{imageName}",produces = MediaType.IMAGE_JPEG_VALUE)
 	    public void downloadImage(
 	            @PathVariable("imageName") String imageName,
-	            HttpServletResponse response
+	            HttpServletResponse response   // used to sent HTTP response 
 	    ) throws IOException {
 
 	        InputStream resource = this.fileService.getResource(path, imageName);
+	        
 	        response.setContentType(MediaType.IMAGE_JPEG_VALUE);
-	        StreamUtils.copy(resource,response.getOutputStream())   ;
+	        // This line of code sets the content type of the response to image/jpeg, 
+	        //indicating that the server will return an image in JPEG format.
+	        
+	        StreamUtils.copy(resource,response.getOutputStream());
+	        
+	        // StreamUtils.copy transfer the data to source (resource) to destination (outputstream)
+	        
 
 	    }
 

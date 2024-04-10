@@ -2,7 +2,9 @@
 
 package com.aneek.book.services.impl;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -37,8 +39,16 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserDto updateUser(UserDto userDto, Integer userId) {
 
-		User user = this.userRepo.findById(userId) // when the userId is not present in db
-				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+//		User user = this.userRepo.findById(userId) // when the userId is not present in db
+//				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+		
+		User user = null;
+		Optional<User> userOptional = this.userRepo.findById(userId);
+		if (userOptional.isPresent()) {
+		    user = userOptional.get();
+		} else {
+		    throw new ResourceNotFoundException("User", "Id", userId);
+		}
 
 		user.setName(userDto.getName());
 		user.setEmail(userDto.getEmail());
@@ -56,6 +66,10 @@ public class UserServiceImpl implements UserService {
 
 		User user = this.userRepo.findById(userId) // when the userId is not present in db
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+		
+		//.orElseThrow():This is a method provided by Java’s Optional class.
+		//If findById finds a user, it returns an Optional containing the user. 
+		//If no user is found, an empty Optional is returned. 
 
 		return this.userToDto(user);
 	}
@@ -65,8 +79,15 @@ public class UserServiceImpl implements UserService {
 
 		List<User> users = this.userRepo.findAll();
 
-		List<UserDto> userDtos = users.stream().map(user -> this.userToDto(user)).collect(Collectors.toList());
+		//List<UserDto> userDtos = users.stream().map(user -> this.userToDto(user)).collect(Collectors.toList());
 		// it will return one by one user and we will put in the list
+		
+		
+		List<UserDto> userDtos = new ArrayList<>();
+		for (User user : users) {
+		    userDtos.add(this.userToDto(user));
+		}
+		
 
 		return userDtos;
 	}

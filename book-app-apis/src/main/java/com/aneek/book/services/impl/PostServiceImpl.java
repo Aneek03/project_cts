@@ -8,6 +8,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -89,12 +90,15 @@ public class PostServiceImpl implements PostService {
 			sort=Sort.by(sortBy).descending();
 		}
 		
+		//PageRequest   p= PageRequest.of(pageNumber, pageSize,sort); 
 		
-		PageRequest   p= PageRequest.of(pageNumber, pageSize,sort);
+		Pageable p = PageRequest.of(pageNumber, pageSize,sort); 
+// by passing this parameters in "of()" method we are telling the Pageable object what is our pagenumber, page size , sorthing order
 		
 		Page<Post> pagePost = this.postRepo.findAll(p);
+// when we pass the Pageable object p in findAll() method it will return the Page class object of type Post
 		
-		List<Post> allPosts = pagePost.getContent();
+		List<Post> allPosts = pagePost.getContent(); // getContent method will return a list 
 		
 		List<PostDto> postDtos =allPosts.stream().map((post)->this.modelMapper.map(post,PostDto.class)).collect(Collectors.toList());
 		
@@ -146,7 +150,9 @@ public class PostServiceImpl implements PostService {
 	@Override
 	public List<PostDto> searchPosts(String keyword) {
 		
-		List<Post> posts = this.postRepo.searchByTitle("%" + keyword + "%");
+		List<Post> posts = this.postRepo.findByTitleContaining(keyword);
+		
+		//List<Post> posts = this.postRepo.searchByTitle("%" + keyword + "%");
         List<PostDto> postDtos = posts.stream().map((post) -> this.modelMapper.map(post, PostDto.class)).collect(Collectors.toList());
        
         return postDtos;

@@ -35,10 +35,11 @@ public class Post {
 	@Column(length = 10000)
 	private String content;
 	
-	private String imageName;
+	private String imageName;			
 	
 	private Date addedDate;
-	
+						        //The cascade= CascadeType.ALL part means that any operations performed on the Post entity,
+	                          //such as persisting, removing, or updating, will be cascaded to the associated Comment entities.
 	@ManyToOne
 	@JoinColumn(name="category_id")
 	private Category category;
@@ -46,7 +47,12 @@ public class Post {
 	@ManyToOne
 	private User user;
 	                   // to make foreign key of comments table
-	@OneToMany(mappedBy="post",cascade= CascadeType.ALL)
+	@OneToMany(mappedBy="post",cascade= CascadeType.ALL) 
 	private Set<Comment> comments = new HashSet<>();
+	
+	//The @OneToMany annotation in Java specifies a one-to-many relationship between two entities. 
+	//In this context, it indicates that a single Post entity can have multiple associated Comment entities. 
+	//The mappedBy="post" attribute tells the persistence framework that the Post entity
+	//is the inverse side of the relationship and the Comment entity owns the relationship.
 
 }
