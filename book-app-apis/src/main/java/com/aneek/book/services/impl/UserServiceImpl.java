@@ -9,11 +9,15 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.aneek.book.exceptions.*;
+import com.aneek.book.config.AppConstants;
+import com.aneek.book.entities.Role;
 import com.aneek.book.entities.User;
 import com.aneek.book.payloads.UserDto;
+import com.aneek.book.repositories.RoleRepo;
 import com.aneek.book.repositories.UserRepo;
 import com.aneek.book.services.UserService;
 
@@ -25,6 +29,12 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private ModelMapper modelMapper;
+	
+	//@Autowired
+	//private PasswordEncoder passwordEncoder;
+	
+	@Autowired
+	private RoleRepo roleRepo;
 
 	@Override
 	public UserDto createUser(UserDto userDto) {
@@ -131,6 +141,52 @@ public class UserServiceImpl implements UserService {
 //		userDto.setAbout(user.getAbout());
 
 		return userDto;
+	}
+
+	@Override
+	public UserDto registerNewUser(UserDto userDto) {
+		// TODO Auto-generated method stub
+		
+		User user = this.modelMapper.map(userDto, User.class);
+		
+		//encoded the password
+		//user.setPassword(this.passwordEncoder.encode(user.getPassword()));
+		
+		//user.setPassword(this.passwordEncoder.encode(user.getPassword()));
+		
+		//roles 
+		Role role =this.roleRepo.findById(AppConstants.NORMAL_USER).get();
+		
+		user.getRoles().add(role);
+		
+		User newUser = this.userRepo.save(user);
+		
+		return this.modelMapper.map(newUser, UserDto.class);
+	}
+
+	@Override
+	public UserDto getUserByEmail(String email) {
+		
+		User user = this.userRepo.findByEmail(email) // when the userId is not present in db
+				.orElseThrow(() -> new ResourceNotFoundException("User", "email "+email, 0));
+		
+		
+		return this.userToDto(user);
+	}
+
+	@Override
+	public UserDto loginUser(String email, String password) {
+		
+		User user = this.userRepo.findByEmail(email) // when the userId is not present in db
+				.orElseThrow(() -> new ResourceNotFoundException("User", "email "+email, 0));
+		
+		if(user != null && user.getPassword().equals(password)) {
+	        // User is authenticated
+	        return this.modelMapper.map(user, UserDto.class);
+	    } else {
+	        // User authentication failed
+	        throw new RuntimeException("Invalid username or password");
+	    }
 	}
 
 }

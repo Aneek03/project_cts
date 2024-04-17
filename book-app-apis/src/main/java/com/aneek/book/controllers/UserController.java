@@ -1,12 +1,14 @@
 // 7th
 
 package com.aneek.book.controllers;   
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.http.ResponseEntity;
+//import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,11 +16,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aneek.book.payloads.ApiResponse;
 import com.aneek.book.payloads.UserDto;
 import com.aneek.book.services.UserService;
+
 
 import jakarta.validation.Valid;
 
@@ -30,14 +34,14 @@ public class UserController {
 private UserService userService;
 
 //POST - create user
-@PostMapping("/")  // Response entity used to represent HTTP response
-
-public ResponseEntity<UserDto>  createUser(@Valid @RequestBody UserDto userDto){
-
-UserDto createUserDto = this.userService.createUser(userDto);
-
-return new ResponseEntity<>(createUserDto, HttpStatus.CREATED);
-}
+//@PostMapping("/")  // Response entity used to represent HTTP response
+//
+//public ResponseEntity<UserDto>  createUser(@Valid @RequestBody UserDto userDto){
+//
+//UserDto createUserDto = this.userService.createUser(userDto);
+//
+//return new ResponseEntity<>(createUserDto, HttpStatus.CREATED);
+//}
 
 //PUT - update user
 
@@ -57,7 +61,8 @@ return ResponseEntity.ok(updatedUser);        // ok status will be sent
 
 
 //DELETE -  delete user
- @DeleteMapping("/{userId}")                      
+ @DeleteMapping("/{userId}") 
+ //@PreAuthorize("hasRole('ROLE_ADMIN')")
 public ResponseEntity<ApiResponse> deleteUser(@PathVariable Integer userId)
 {                              // ? used to denote any type
  
@@ -82,4 +87,37 @@ public ResponseEntity<ApiResponse> deleteUser(@PathVariable Integer userId)
  {
  return ResponseEntity.ok(this.userService.getUserById(userId));
  }
+ 
+// register new user api
+ @PostMapping("/")
+ public ResponseEntity<UserDto> registerUser(@RequestBody UserDto userDto){
+	 
+	 UserDto registerUser = this.userService.registerNewUser(userDto);
+	 
+	 return new ResponseEntity<UserDto>(registerUser,HttpStatus.CREATED);
+ }
+ 
+// @GetMapping("/{email}")
+//	public ResponseEntity<UserDto> getUserByEmail(@PathVariable String email) {
+//	 return ResponseEntity.ok(this.userService.getUserByEmail(email));
+//	}
+// 
+ 
+ @GetMapping("/email/{email}")
+ public ResponseEntity<UserDto> getUserByEmail(@PathVariable String email) {
+     UserDto userDto = userService.getUserByEmail(email);
+     return new ResponseEntity<>(userDto, HttpStatus.OK);
+ }
+ 
+ @PostMapping("/login")
+ public ResponseEntity<UserDto> loginUser(@RequestParam String email, @RequestParam String password){
+     try {
+         UserDto loggedInUser = this.userService.loginUser(email, password);
+         return new ResponseEntity<>(loggedInUser, HttpStatus.OK);
+     } catch (RuntimeException e) {
+         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+     }
+ }
+ 
+ 
 }
